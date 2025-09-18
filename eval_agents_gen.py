@@ -1,0 +1,168 @@
+from overcooked_ai_py.mdp.overcooked_env import OvercookedEnv, Overcooked
+from overcooked_ai_py.mdp.overcooked_mdp import OvercookedGridworld
+from overcooked_ai_py.mdp.actions import Action
+from overcooked_ai_py.agents.agent import RandomAgent
+from policy_gen import Policy, ValueFunctionApproximator
+from myAgent_gen import myAgent
+import tensorflow as tf
+import argparse
+from PIL import Image
+import time
+import os
+
+
+def parse_args():
+    """
+    Parse command line arguments for the experiment configuration.
+
+    Returns:
+        args (Namespace): Parsed command line arguments.
+    """
+
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--exp-name", type=str, default="GEN_exp_increasing_difficulty_4",
+                        help="the name of the experiment from which weights will be loaded")
+    parser.add_argument("--seed", type=int, default=42, help="set the seed for reproducibility of the experiment")
+    parser.add_argument("--num-episodes", type=int, default=10,
+                        help="number of episodes for which to compute the average reward")
+    parser.add_argument("--two-actors", type=bool, default=False,
+                        help="whether to use one policy for each agent")
+    parser.add_argument("--refresh-rate", type=int, default=100, help="refresh-rate for displaying the episode")
+    parser.add_argument("--entropy-coef", type=float, default=0.01, help="entropy coefficient for the entropy bonus in the loss function")
+    parser.add_argument("--render", type=lambda x: (str(x).lower() == "true"), default=False,
+                        help="whether to render or not the first episode")
+
+    args = parser.parse_args()
+
+    return args
+
+def load_weights():
+    if TWO_ACTORS:
+        actor_1.load_weights(PATH_ACTOR_1)
+        actor_2.load_weights(PATH_ACTOR_2)
+    else:
+        actor.load_weights(PATH_ACTOR)
+    print("")
+    print("Weights successfully loaded.")
+    print("")
+
+if __name__ == "__main__":
+    args = parse_args()
+
+    # algorithm specifications
+    EXP_NAME = args.exp_name
+    NUM_EPISODES = args.num_episodes
+    SEED = args.seed
+    RENDER = args.render
+    TWO_ACTORS = args.two_actors
+    ENTROPY = args.entropy_coef
+
+    PATH_ACTOR = os.path.join("weights", "actor", "actor_" + EXP_NAME + ".weights.h5")
+    PATH_ACTOR_1 = os.path.join("weights", "actor", "actor_1_" + EXP_NAME + ".weights.h5")
+    PATH_ACTOR_2 = os.path.join("weights", "actor", "actor_2_" + EXP_NAME + ".weights.h5")
+
+
+
+    
+    print("TF version:", tf.__version__)
+    print("GPUs:", tf.config.list_physical_devices("GPU"))
+
+    print("")
+    print("EXPERIMENT INFO.")
+    print(f"Experiment Name: {EXP_NAME}")
+    print(f"Number of episodes: {NUM_EPISODES}")
+    print("")
+
+    #initialization environment
+    horizon = 400
+    layout_name = "coordination_ring"
+    base_mdp = OvercookedGridworld.from_layout_name(layout_name=layout_name)
+    base_env = OvercookedEnv.from_mdp(base_mdp, info_level=0, horizon=horizon)
+    env = Overcooked(base_env=base_env, featurize_fn=base_env.featurize_state_mdp)
+    env.render_mode = 'rgb_array'
+
+    inp_shape = env.observation_space.shape[0]
+    new_inp_shape = (inp_shape*2 + 5,)
+    print(" Input shape:", new_inp_shape)
+
+
+    if EXP_NAME == "random_agents":
+        agent_1 = RandomAgent(all_actions=True)
+        agent_2 = RandomAgent(all_actions=True)
+    elif TWO_ACTORS:
+        actor_1 = Policy(inp_shape=new_inp_shape, num_actions=Action.NUM_ACTIONS, entropy_coef=ENTROPY, optimizer=None)
+        actor_2 = Policy(inp_shape=new_inp_shape, num_actions=Action.NUM_ACTIONS, entropy_coef=ENTROPY, optimizer=None)
+        load_weights()
+        agent_1 = myAgent(actor=actor_1, critic=None, old_policy=None, idx=0, base_env=base_env)
+        agent_2 = myAgent(actor=actor_2, critic=None, old_policy=None, idx=1, base_env=base_env)
+    else:
+        actor = Policy(inp_shape=new_inp_shape, num_actions=Action.NUM_ACTIONS, entropy_coef=ENTROPY, optimizer=None)
+        load_weights()
+        agent_1 = myAgent(actor=actor, critic=None, old_policy=None, idx=0, base_env=base_env)
+        agent_2 = myAgent(actor=actor, critic=None, old_policy=None, idx=1, base_env=base_env)
+
+    cumulative_sparse_rewards = []  # list of cumulative sparse rewards for each episode
+    cumulative_shaped_rewards = []  # list of cumulative shaped rewards for each episode
+
+    # running the episodes
+    for episode in range(1, NUM_EPISODES + 1):
+        states = []
+
+        t = 0
+        obs = env.reset()
+        done = False
+
+        episode_sparse_rewards = [0]
+        episode_shaped_rewards = [0]
+
+        start = time.time()
+
+        while not done:
+            action_1 = agent_1.action(obs['both_agent_obs'], [0,0,1,0,0])
+            action_2 = agent_2.action(obs['both_agent_obs'], [0,0,1,0,0])
+
+            agent_1_action_idx = Action.ACTION_TO_INDEX[action_1[0]]
+            agent_2_action_idx = Action.ACTION_TO_INDEX[action_2[0]]
+
+            action = (agent_1_action_idx, agent_2_action_idx)
+
+            states.append(obs['overcooked_state'])
+
+            new_obs, reward, done, env_info = env.step(action)
+
+            shaped_rewad = sum(env_info['shaped_r_by_agent'])
+            sparse_reward = reward
+            total_reward= shaped_rewad + sparse_reward
+
+            episode_sparse_rewards.append(sparse_reward)
+            episode_shaped_rewards.append(total_reward)
+
+            obs = new_obs
+
+            if RENDER and episode == 2:
+                img = env.render()
+
+                frame_file = os.path.join("renders", f"episode_{episode}_frame_{t}.png")
+                Image.fromarray(img).save(frame_file)
+
+            t += 1
+
+        cumulative_shaped_rewards.append(sum(episode_shaped_rewards))
+        cumulative_sparse_rewards.append(sum(episode_sparse_rewards))
+
+        average_shaped_reward = round(sum(cumulative_shaped_rewards)/len(cumulative_shaped_rewards), 3)
+        average_sparse_reward = round(sum(cumulative_sparse_rewards)/len(cumulative_shaped_rewards), 3)
+
+        end_episode = time.time()
+
+        print(f"Episode [{episode:>3d}] terminated at timestep {t}. "
+              f"cumulative sparse reward: {sum(episode_sparse_rewards):>3d}."
+              f"cumulative shaped reward: {sum(episode_shaped_rewards):>3d}.")
+
+    time.sleep(1)
+
+    print("")
+    print(f"Average results in {NUM_EPISODES} episodes:")
+    print(f"avg sparse reward: {average_sparse_reward}. ")
+    print(f"avg shaped reward: {average_shaped_reward}. ")
+    print("")
