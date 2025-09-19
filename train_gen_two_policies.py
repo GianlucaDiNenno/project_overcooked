@@ -1,7 +1,7 @@
 from policy_gen import Policy, ValueFunctionApproximator
 from myAgent_gen import myAgent
 from gen_overcooked import GeneralizedOvercooked
-from overcooked_ai_py.mdp.actions import Action
+from src.overcooked_ai_py.mdp.actions import Action
 import numpy as np
 import matplotlib.pyplot as plt
 import tensorflow as tf
@@ -18,17 +18,17 @@ def parse_args():
     Command line arguments for the experiment configuration.
     """
     parser = argparse.ArgumentParser()
-    parser.add_argument("--exp-name", type=str, default="GEN_exp_two_policies", help="the name of this experiment")
-    parser.add_argument("--seed", type=int, default=42, help="set the seed for reproducibility of the experiment")
-    parser.add_argument("--num-episodes", type=int, default=2000, help="number of episodes to train the agent on")
-    parser.add_argument("--num-epochs", type=int, default=4, help="number of epochs to train the agent on with SGD")
-    parser.add_argument("--batch-size", type=int, default=128, help="batch size of the training with SGD")
+    parser.add_argument("--exp-name", type=str, default="GEN_exp_two_policies", help="name of this experiment")
+    parser.add_argument("--seed", type=int, default=42, help="set the seed for reproducibility")
+    parser.add_argument("--num-episodes", type=int, default=2000, help="number of episodes for training")
+    parser.add_argument("--num-epochs", type=int, default=4, help="number of epochs to train the networks per episode")
+    parser.add_argument("--batch-size", type=int, default=128, help="batch size of the training")
     parser.add_argument("--entropy-coef", type=float, default=0.01, help="entropy coefficient for the entropy bonus in the loss function")
-    parser.add_argument("--gamma", type=float, default=0.99, help="discount factor for rewards and future state value estimations")
+    parser.add_argument("--gamma", type=float, default=0.99, help="discount factor")
     parser.add_argument("--gae-lambda", type=float, default=0.95, help="lambda parameter for GAE")
     parser.add_argument("--lr-c", type=float, default=3e-4, help="learning rate for the critic")
     parser.add_argument("--lr-a", type=float, default=3e-4, help="learning rate for the actor")
-    parser.add_argument("--load-weights", type=lambda x: (str(x).lower() == "true"), default=True, help="whether to load the weights of a previous experiment")
+    parser.add_argument("--load-weights", type=lambda x: (str(x).lower() == "true"), default=True, help="whether to load the weights from file")
     parser.add_argument("--loading_file", type=str, default="", help="name of the file from which to load the weights")
     parser.add_argument("--saving_file", type=str, default="GEN_exp_two_policies", help="name of the file in which to save the weights")
     parser.add_argument("--ppo-epsilon", type=float, default=0.2, help="epsilon for clipping in PPO.")

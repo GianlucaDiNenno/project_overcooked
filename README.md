@@ -9,8 +9,12 @@ Overcooked-AI is a benchmark environment based on the video game Overcooked, whe
  Relevant files in the project:
  
  - `training_gpu` : gpu accelerated implementation to train agents on single layout cramped_room
- - `training_incr.py`: gpu accelerated implementation to train agents on multiple layout. Incr because it save weights with increasing difficulty capability of solving difficult layouts
- - `train_two_policies.py` : imlementation of 2 different policies one for each agent.
+ - `training_gen_incr.py`: gpu accelerated implementation to train agents on multiple layout. Incr because it save weights with increasing difficulty capability of solving difficult layouts
+ - `train_gen_two_policies.py` : implementation of 2 different policies one for each agent.
+ - `gen_overcooked.py`: file containing the class GeneralizedOvercooked
+ - `myAgent_gen.py`: file containg myAgent class with action() function
+ - `policy_gen.py`: file containing the policy and value function network implementation for a general layout.
+ - `policy_gpu.py`: file containing the policy and value function network implementation for a single layout.
  - `report.pdf`: pdf containg the project report
- - `weights/`: folder containg the weights of the models with the corresponding experimant name
+ - `weights/`: folder containg the weights of the critic and actor with the corresponding experiment name
  
