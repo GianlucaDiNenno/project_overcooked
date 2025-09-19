@@ -26,7 +26,6 @@ def parse_args():
     parser.add_argument("--seed", type=int, default=42, help="set the seed for reproducibility of the experiment")
     parser.add_argument("--num-episodes", type=int, default=10,
                         help="number of episodes for which to compute the average reward")
-    parser.add_argument("--refresh-rate", type=int, default=100, help="refresh-rate for displaying the episode")
     parser.add_argument("--render", type=lambda x: (str(x).lower() == "true"), default=False,
                         help="whether to render or not the first episode")
 
@@ -46,7 +45,6 @@ if __name__ == "__main__":
     # algorithm specifications
     EXP_NAME = args.exp_name
     NUM_EPISODES = args.num_episodes
-    REFRESH_RATE = args.refresh_rate
     SEED = args.seed
     RENDER = args.render
 
@@ -144,5 +142,6 @@ if __name__ == "__main__":
     print("")
     print(f"Average results in {NUM_EPISODES} episodes:")
     print(f"avg sparse reward: {average_sparse_reward}. ")
+    print(f"max sparse reward: {max(cumulative_sparse_rewards)}.")
     print(f"avg shaped reward: {average_shaped_reward}. ")
     print("")
