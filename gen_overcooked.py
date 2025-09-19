@@ -1,8 +1,11 @@
-from overcooked_ai_py.mdp.overcooked_env import OvercookedEnv, Overcooked
-from overcooked_ai_py.mdp.overcooked_mdp import OvercookedGridworld
+from src.overcooked_ai_py.mdp.overcooked_env import OvercookedEnv, Overcooked
+from src.overcooked_ai_py.mdp.overcooked_mdp import OvercookedGridworld
 import random
 
 class GeneralizedOvercooked:
+    """
+    Class to handle multiple Overcooked environments with different layouts.
+    """
     def __init__(self, layouts, info_level=0, horizon=400):
         self.envs = []
         self.num_layouts = len(layouts)
@@ -17,14 +20,14 @@ class GeneralizedOvercooked:
         self.action_space = self.current_env.action_space
 
     def reset(self):
-        # self.current_env = np.random.choice(self.envs)
-        # return self.current_env.reset()
-        self.cur_idx = (self.cur_idx + 1) % len(self.envs)
-        #self.cur_idx = random.randint(0, len(self.envs)-1)
+        self.cur_idx = (self.cur_idx + 1) % len(self.envs) # iterate through the environments
+        #self.cur_idx = random.randint(0, len(self.envs)-1) # alternatively, randomly select an environment
         self.current_env = self.envs[self.cur_idx]
         return self.current_env.reset()
     
     def get_layout_one_hot(self):
+        """
+        Returns a one-hot encoded representation of the current layout."""
         one_hot = [0] * self.num_layouts
         one_hot[self.cur_idx] = 1
         return one_hot
