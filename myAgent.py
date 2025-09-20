@@ -1,8 +1,8 @@
-from src.overcooked_ai_py.mdp.actions import Action
-from src.overcooked_ai_py.agents.agent import Agent
+from overcooked_ai_py.mdp.actions import Action
+from overcooked_ai_py.agents.agent import Agent
 from policy_gpu import Policy, ValueFunctionApproximator
-from src.overcooked_ai_py.mdp.overcooked_env import OvercookedEnv
-from src.overcooked_ai_py.mdp.overcooked_mdp import OvercookedGridworld, OvercookedState
+from overcooked_ai_py.mdp.overcooked_env import OvercookedEnv
+from overcooked_ai_py.mdp.overcooked_mdp import OvercookedGridworld, OvercookedState
 import numpy as np
 
 class myAgent(Agent):

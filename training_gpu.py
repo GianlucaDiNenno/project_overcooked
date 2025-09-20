@@ -1,16 +1,13 @@
 from policy_gpu import Policy, ValueFunctionApproximator
 from myAgent import myAgent
-from src.overcooked_ai_py.mdp.overcooked_env import OvercookedEnv, Overcooked
-from src.overcooked_ai_py.mdp.overcooked_mdp import OvercookedGridworld
-from src.overcooked_ai_py.mdp.actions import Action
+from overcooked_ai_py.mdp.overcooked_env import OvercookedEnv, Overcooked
+from overcooked_ai_py.mdp.overcooked_mdp import OvercookedGridworld
+from overcooked_ai_py.mdp.actions import Action
 import numpy as np
-import matplotlib.pyplot as plt
 import tensorflow as tf
 from keras.optimizers import Adam
 from typing import Tuple, List, Dict
-import sys
 import argparse
-import json
 import time
 import os
 

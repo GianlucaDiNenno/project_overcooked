@@ -1,15 +1,12 @@
 from policy_gen import Policy, ValueFunctionApproximator
 from myAgent_gen import myAgent
 from gen_overcooked import GeneralizedOvercooked
-from src.overcooked_ai_py.mdp.actions import Action
+from overcooked_ai_py.mdp.actions import Action
 import numpy as np
-import matplotlib.pyplot as plt
 import tensorflow as tf
 from keras.optimizers import Adam
-from typing import Tuple, List, Dict
-import sys
+from typing import Tuple, List
 import argparse
-import json
 import time
 import os
 
@@ -30,7 +27,7 @@ def parse_args():
     parser.add_argument("--lr-c", type=float, default=3e-4, help="learning rate for the critic")
     parser.add_argument("--lr-a", type=float, default=3e-4, help="learning rate for the actor")
     parser.add_argument("--load-weights", type=lambda x: (str(x).lower() == "true"), default=True, help="whether to load the weights from file")
-    parser.add_argument("--loading_file", type=str, default="", help="name of the file from which to load the weights")
+    parser.add_argument("--loading_file", type=str, default="GEN_at_once_not_random", help="name of the file from which to load the weights")
     parser.add_argument("--saving_file", type=str, default="GEN_at_once_not_random", help="name of the file in which to save the weights")
     parser.add_argument("--ppo-epsilon", type=float, default=0.2, help="epsilon for clipping in PPO.")
 

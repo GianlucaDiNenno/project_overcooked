@@ -1,5 +1,5 @@
-from src.overcooked_ai_py.mdp.overcooked_env import OvercookedEnv, Overcooked
-from src.overcooked_ai_py.mdp.overcooked_mdp import OvercookedGridworld
+from overcooked_ai_py.mdp.overcooked_env import OvercookedEnv, Overcooked
+from overcooked_ai_py.mdp.overcooked_mdp import OvercookedGridworld
 import random
 
 class GeneralizedOvercooked:

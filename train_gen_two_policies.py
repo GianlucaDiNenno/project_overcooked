@@ -1,15 +1,12 @@
 from policy_gen import Policy, ValueFunctionApproximator
 from myAgent_gen import myAgent
 from gen_overcooked import GeneralizedOvercooked
-from src.overcooked_ai_py.mdp.actions import Action
+from overcooked_ai_py.mdp.actions import Action
 import numpy as np
-import matplotlib.pyplot as plt
 import tensorflow as tf
 from keras.optimizers import Adam
-from typing import Tuple, List, Dict
-import sys
+from typing import Tuple, List
 import argparse
-import json
 import time
 import os
 
@@ -155,7 +152,7 @@ if __name__ == "__main__":
         inp_shape=new_inp_shape,
         num_actions=Action.NUM_ACTIONS,
         optimizer=Adam(learning_rate=LR_ACTOR),
-        entropy_loss=ENTROPY,
+        entropy_coef=ENTROPY,
         epsilon=PPO_EPSILON
     )
 
@@ -163,7 +160,7 @@ if __name__ == "__main__":
         inp_shape=new_inp_shape,
         num_actions=Action.NUM_ACTIONS,
         optimizer=Adam(learning_rate=LR_ACTOR),
-        entropy_loss=ENTROPY,
+        entropy_coef=ENTROPY,
         epsilon=PPO_EPSILON
     )
 
@@ -172,8 +169,8 @@ if __name__ == "__main__":
         optimizer=Adam(learning_rate=LR_CRITIC)
     )
 
-    old_policy_1 = Policy(inp_shape=new_inp_shape, num_actions=Action.NUM_ACTIONS, optimizer=None, entropy_loss=ENTROPY)
-    old_policy_2 = Policy(inp_shape=new_inp_shape, num_actions=Action.NUM_ACTIONS, optimizer=None, entropy_loss=ENTROPY)
+    old_policy_1 = Policy(inp_shape=new_inp_shape, num_actions=Action.NUM_ACTIONS, optimizer=None, entropy_coef=ENTROPY)
+    old_policy_2 = Policy(inp_shape=new_inp_shape, num_actions=Action.NUM_ACTIONS, optimizer=None, entropy_coef=ENTROPY)
 
     load_weights()
 

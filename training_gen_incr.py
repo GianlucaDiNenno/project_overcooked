@@ -1,15 +1,12 @@
 from policy_gen import Policy, ValueFunctionApproximator
 from myAgent_gen import myAgent
 from gen_overcooked import GeneralizedOvercooked
-from src.overcooked_ai_py.mdp.actions import Action
+from overcooked_ai_py.mdp.actions import Action
 import numpy as np
-import matplotlib.pyplot as plt
 import tensorflow as tf
 from keras.optimizers import Adam
-from typing import Tuple, List, Dict
-import sys
+from typing import Tuple, List
 import argparse
-import json
 import time
 import os
 
